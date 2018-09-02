@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Canvas</title>
+    <style>
+    	* { padding: 0; margin: 0; }
+    	canvas { background: rgb(255, 224, 168); display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+
+<canvas id="myCanvas" width="480" height="320"></canvas>
+<script>
+	var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+    //ctxの設定 //全ての命令はbeginPath()メソッドと closePath()メソッドの間に記述
+    ctx.beginPath();
+    ctx.arc(240,160,20,0,Math.PI*2,false);//円の中心のx、y座標 円の半径 開始角度と終了角度
+    ctx.fillstyle = "green"//時計回りはfalseで、デフォルト。半時計回りはtrue
+    ctx.fill();
+    ctx.closePath();
+    //Canvasの映像を毎フレーム、定期的に更新し続けるためには、
+    //何度も実行されるような関数を定義する必要がある
+    var x = canvas.width/2;//位置 (50,50) のかわりに x、yという名の変数
+    var y = canvas.height-30;
+    var dx = 2;//xとyに毎フレーム描画した後に小さな値を加える
+    var dy = -2;
+    //パドルの高さと幅、x軸上の開始地点を定義
+    var paddleHeight = 10;
+    var paddleWidth = 75;
+    var paddleX = (canvas.width-paddleWidth)/2;
+    var rightPressed = false;
+    var leftPressed = false;
+    //描画される円の半径
+    //ボールを弾ませる壁は4つ
+    //毎フレーム、ボールがCanvasの上端に触っているか
+    //どうか確認する必要があります。もし触っているなら、
+    //ボールの動きを反転させ、ボールが反対方向に動く
+    var ballRadius = 10;
+    function drawBall(){
+        ctx.beginPath();
+        ctx.arc(x,y,ballRadius,0,Math.PI*2);
+        ctx.fillStyle = "#0095DD";
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    function drawPaddle(){
+        ctx.beginPath();
+        ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth, paddleHeight);
+        ctx.fillStyle = "#666eee";
+        ctx.fill();
+        ctx.closePath();
+    }
+        function draw(){
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBall();
+        drawPaddle();
+        x += dx;
+        y += dy;
+        function aa(){
+            var color = Math.floor( Math.random() * 16777215).toString(16); 
+                var random = "#" +  color;   
+                ctx.fillStyle = random;
+                ctx.fill();
+        }
+        //上下
+        //yの値が0未満だったら、符号反転
+        //Canvasの高さである480ピクセル
+        if(y + dy > canvas.height-ballRadius || y+ dy < ballRadius){
+                dy = -dy;
+                aa();
+            }
+        //左右
+        if(x + dx > canvas.width-ballRadius || x+ dx < ballRadius){
+            dx = -dx;
+        }
+        if(rightPressed && paddleX < canvas.width-paddleWidth) {
+        paddleX += 7;
+        }
+        else if(leftPressed && paddleX > 0) {
+            paddleX -= 7;
+        }
+    }
+
+    document.addEventListener("keydown",keyDownHandler,false);
+    document.addEventListener("keyup", keyUpHandler, false);
+    function keyDownHandler(e){
+        if(e.keyCode == 39){
+            rightPressed = true;
+        }
+        else if(e.keyCode === 37){
+            leftPressed = true;
+        };
+    }
+    function keyUpHandler(e) {
+        if(e.keyCode == 39) {
+            rightPressed = false;
+        }
+        else if(e.keyCode == 37) {
+            leftPressed = false;
+        }
+    }
+    //無限に続くsetInterval  draw()は10ミリ秒おき
+    setInterval(draw,20);
+
+
+    
+</script>
+
+</body>
+</html>
